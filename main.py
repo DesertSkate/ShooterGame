@@ -22,6 +22,7 @@ for x in range(10):
 
 while playing:
     window.fill((0, 0, 0))
+    enemy_rects = update_rects(enemies)
     for event in pygame.event.get():
         if event.type == pygame.QUIT: playing = False
 
@@ -39,12 +40,13 @@ while playing:
         projectile.update()
 
     for enemy in enemies:
-        enemy_rects = update_rects(enemies)
         if enemy.check_death():
             enemies.remove(enemy)
             continue
+        enemy.move()
         enemy.draw()
 
     Player.draw()
     clock.tick(60)
     pygame.display.update()
+    # print(enemies[0].path_point, enemies[0].x, enemies[0].y)
