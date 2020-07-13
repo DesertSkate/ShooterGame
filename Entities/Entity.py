@@ -1,16 +1,27 @@
 import pygame
+import time
 
 
 class entity:
-    def __init__(self, window, name, iff, health, speed=0, x=0, y=0, size=(0,0)):
+    def __init__(self, window, name, iff, health, color, speed=0, x=0, y=0, size=(0,0)):
         self.window = window
         self.name = name
         self.iff = iff
         self.health = health
+        self.init_color = color
+        self.color = color
         self.speed = speed
         self.x = x
         self.y = y
         self.size = size
+
+        self.damage_time = time.time()
+
+    def take_damage(self, damage):
+        self.damage_time = time.time()
+        self.color = (255, 255, 255)
+
+        self.health -= damage
 
     def check_boundaries(self):
         width, height = pygame.display.get_surface().get_size()
@@ -22,6 +33,11 @@ class entity:
             self.y = height - self.size[0]
         elif self.y < 0:
             self.y = 0
+
+    def check_death(self):
+        if self.health <= 0:
+            return True
+        return False
 
 
 class projectile:
@@ -35,6 +51,8 @@ class projectile:
         self.damage = damage
         self.color = color
         self.iff = iff
+
+        self.proj = pygame.draw.circle(self.window, self.color, (int(self.x), int(self.y)), self.radius)
 
     def update(self):
         self.x += self.x_speed

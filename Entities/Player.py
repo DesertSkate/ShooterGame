@@ -4,13 +4,12 @@ from .Entity import entity, projectile
 
 
 class player(entity):
-    def __init__(self, window, name, iff, health, speed=0, bullet_speed=2, x=0, y=0, size=(0,0)):
-        self.color = (34, 199, 64)
+    def __init__(self, window, name, iff, health, color, speed=0, bullet_speed=2, x=0, y=0, size=(0,0)):
         self.bullet_time = time.time()
         self.dash_time = time.time()
         self.bullet_speed = bullet_speed
         self.dashing = False
-        super().__init__(window, name, iff, health, speed, x, y, size)
+        super().__init__(window, name, iff, health, color, speed, x, y, size)
 
     def shoot(self, list): # https://stackoverflow.com/questions/52213088/how-to-shoot-a-bullet-at-an-angle-in-pygame
         cur_time = time.time()
@@ -45,6 +44,9 @@ class player(entity):
 
     def draw(self):
         super().check_boundaries()
+        if time.time() > self.damage_time + 0.3:
+            self.color = self.init_color
+
         self.player_rect = pygame.Rect((self.x - self.size[0] / 2, self.y - self.size[1] / 2),
                                        self.size)
         pygame.draw.rect(self.window, self.color, self.player_rect)
