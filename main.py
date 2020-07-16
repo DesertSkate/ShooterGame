@@ -9,7 +9,7 @@ window = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 pygame.display.set_caption("Boom")
 
-Player = player(window, "Player", "player", 12, (34, 199, 64), 3, 7, width/2, height/2, (25, 45))
+Player = player(window, "Player", "player", 12, (34, 199, 64), 3, 15, width/2, height/2, (25, 45))
 projectiles = []
 enemies = []
 enemy_rects = []
@@ -17,7 +17,7 @@ playing = True
 
 for x in range(10):
     pos = (random.randint(300, 800), random.randint(200, 400))
-    new_enemy = Enemy(window, f"Enemy{x}", "enemy", 3, ("basic", "single"), (181,18, 18), 2, 2, pos[0], pos[1], (30,30))
+    new_enemy = Enemy(window, f"Enemy{x}", "enemy", 3, ("basic", "single"), (181,18,18), 2, 2, pos[0], pos[1], (30,30))
     enemies.append(new_enemy)
 
 while playing:

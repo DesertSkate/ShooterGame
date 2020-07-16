@@ -11,13 +11,31 @@ class Enemy(entity):
         self.bullet_speed = bullet_speed
         self.moving = False
         self.move_time = time.time()
+        self.shoot_time = time.time()
         self.path_point = (x, y)
         super().__init__(window, name, iff, health, color, speed, x, y, size)
         self.enemy_rect = pygame.Rect((self.x - self.size[0] / 2, self.y - self.size[1] / 2),
                                       self.size)
 
-    def shoot(self):
-        pass
+    def shoot(self, player_pos):
+        if not time.time() > self.shoot_time + self.get_idle_shoot():
+            return
+
+        x, y = player_pos
+        x2, y2 = x - self.x, y - self.y
+        distance = (x2 ** 2 + y2 ** 2) ** .5
+
+        if distance != 0:
+            normalized = self.bullet_speed
+            multiplier = normalized / distance
+
+            x2 *= multiplier
+            y2 *= multiplier
+
+        if pygame.mouse.get_pressed()[0]:
+            new_proj = projectile(self.window, int(self.x), int(self.y), x2, y2, 10, 1, (201, 113, 24),
+                                          "player")
+            list.append(new_proj)
 
     def move(self):
         if not self.moving:
@@ -59,6 +77,16 @@ class Enemy(entity):
         p_type = self.ai[0]
         if p_type == "basic":
             return 1
+
+    def get_idle_shoot(self):
+        total = 0
+        p_type = self.ai[0]
+        w_type = self.ai[0]
+        if p_type == "baisc":
+            total += 1
+        if w_type == "single":
+            total += 0.5
+        return total
 
 
 def update_rects(enemy_list):
