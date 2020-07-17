@@ -15,7 +15,7 @@ enemies = []
 enemy_rects = []
 playing = True
 
-for x in range(10):
+for x in range(5):
     pos = (random.randint(300, 800), random.randint(200, 400))
     new_enemy = Enemy(window, f"Enemy{x}", "enemy", 3, ("basic", "single"), (181,18,18), 2, 2, pos[0], pos[1], (30,30))
     enemies.append(new_enemy)
@@ -26,15 +26,21 @@ while playing:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: playing = False
 
+    Player.dash()
     Player.move()
     Player.shoot(projectiles)
     for projectile in projectiles:
         collide = projectile.proj.collidelist(enemy_rects)
+        collide2 = Player.player_rect.colliderect(projectile.proj)
         if projectile.check_boundary():
             projectiles.remove(projectile)
             continue
-        if collide > -1:
+        if collide > -1 and projectile.iff != "enemy":
             enemies[collide].take_damage(projectile.damage)
+            projectiles.remove(projectile)
+            continue
+        if collide2 and projectile.iff != "player" and not Player.dashing:
+            Player.take_damage(projectile.damage)
             projectiles.remove(projectile)
             continue
         projectile.update()
@@ -44,6 +50,7 @@ while playing:
             enemies.remove(enemy)
             continue
         enemy.move()
+        enemy.shoot(projectiles, (Player.x, Player.y))
         enemy.draw()
 
     Player.draw()

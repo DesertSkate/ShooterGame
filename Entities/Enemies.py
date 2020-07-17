@@ -17,7 +17,7 @@ class Enemy(entity):
         self.enemy_rect = pygame.Rect((self.x - self.size[0] / 2, self.y - self.size[1] / 2),
                                       self.size)
 
-    def shoot(self, player_pos):
+    def shoot(self, list, player_pos):
         if not time.time() > self.shoot_time + self.get_idle_shoot():
             return
 
@@ -32,10 +32,10 @@ class Enemy(entity):
             x2 *= multiplier
             y2 *= multiplier
 
-        if pygame.mouse.get_pressed()[0]:
-            new_proj = projectile(self.window, int(self.x), int(self.y), x2, y2, 10, 1, (201, 113, 24),
-                                          "player")
-            list.append(new_proj)
+        self.shoot_time = time.time()
+        new_proj = projectile(self.window, int(self.x), int(self.y), x2, y2, 10, 1, self.init_color,
+                                          "enemy")
+        list.append(new_proj)
 
     def move(self):
         if not self.moving:
@@ -82,7 +82,7 @@ class Enemy(entity):
         total = 0
         p_type = self.ai[0]
         w_type = self.ai[0]
-        if p_type == "baisc":
+        if p_type == "basic":
             total += 1
         if w_type == "single":
             total += 0.5
