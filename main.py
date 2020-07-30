@@ -2,6 +2,7 @@ import pygame
 import random
 from Entities.Player import player
 from Entities.Enemies import Enemy, update_rects
+from Entities.Map import map
 
 pygame.init()
 size = width, height = 1200, 800
@@ -10,6 +11,8 @@ clock = pygame.time.Clock()
 pygame.display.set_caption("Boom")
 
 Player = player(window, "Player", "player", 12, (34, 199, 64), 3, 15, width/2, height/2, (25, 45))
+Map = map(window)
+Map.gen_map()
 projectiles = []
 enemies = []
 enemy_rects = []
@@ -22,6 +25,7 @@ for x in range(5):
 
 while playing:
     window.fill((0, 0, 0))
+    Map.draw_map()
     enemy_rects = update_rects(enemies)
     for event in pygame.event.get():
         if event.type == pygame.QUIT: playing = False
@@ -54,6 +58,8 @@ while playing:
         enemy.draw()
 
     Player.draw()
+    test_rect = pygame.Rect((0,0), (80,80))
+    pygame.draw.rect(window, (255, 255, 255), test_rect)
     clock.tick(60)
     pygame.display.update()
     # print(enemies[0].path_point, enemies[0].x, enemies[0].y)
