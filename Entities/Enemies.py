@@ -60,7 +60,7 @@ class Enemy(entity):
         if time.time() > self.move_time + self.get_idle_time() and not self.moving:
             self.get_point()
 
-        self.enemy_rect = pygame.Rect((self.x - self.size[0] / 2, self.y - self.size[1] / 2),
+        self.enemy_rect = pygame.Rect((self.x, self.y),
                                        self.size)
         pygame.draw.rect(self.window, self.color, self.enemy_rect)
 

@@ -10,16 +10,17 @@ window = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 pygame.display.set_caption("Boom")
 
-Player = player(window, "Player", "player", 12, (34, 199, 64), 3, 15, width/2, height/2, (25, 45))
 Map = map(window)
 Map.gen_map()
+test_tile = Map.get_empty_tile(True)
+Player = player(window, "Player", "player", 12, (34, 199, 64), 3, 15, test_tile[0], test_tile[1], (25, 45))
 projectiles = []
 enemies = []
 enemy_rects = []
 playing = True
 
 for x in range(5):
-    pos = (random.randint(300, 800), random.randint(200, 400))
+    pos = Map.get_empty_tile(True)
     new_enemy = Enemy(window, f"Enemy{x}", "enemy", 3, ("basic", "single"), (181,18,18), 2, 2, pos[0], pos[1], (30,30))
     enemies.append(new_enemy)
 
@@ -32,6 +33,7 @@ while playing:
 
     Player.dash()
     Player.move()
+    Map.smart_collide(Player, True)
     Player.shoot(projectiles)
     for projectile in projectiles:
         collide = projectile.proj.collidelist(enemy_rects)
@@ -54,12 +56,16 @@ while playing:
             enemies.remove(enemy)
             continue
         enemy.move()
+        Map.smart_collide(enemy, True)
         enemy.shoot(projectiles, (Player.x, Player.y))
         enemy.draw()
+        pygame.draw.line(window, (100, 100, 100), (0, 0), (enemy.x, enemy.y), 2)
 
     Player.draw()
-    test_rect = pygame.Rect((0,0), (80,80))
-    pygame.draw.rect(window, (255, 255, 255), test_rect)
+    pygame.draw.line(window, (100, 100, 100), (0, 0), (Player.x, Player.y), 2)
+    print(Player.x, Player.y)
+    print(Map.get_square_by_pos((Player.x, Player.y)))
+    Map.draw_test_lines()
     clock.tick(60)
     pygame.display.update()
     # print(enemies[0].path_point, enemies[0].x, enemies[0].y)

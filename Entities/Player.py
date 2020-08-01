@@ -84,6 +84,6 @@ class player(entity):
         if time.time() > self.damage_time + 0.3:
             self.color = self.init_color
 
-        self.player_rect = pygame.Rect((self.x - self.size[0] / 2, self.y - self.size[1] / 2),
+        self.player_rect = pygame.Rect((self.x, self.y),
                                        self.size)
         pygame.draw.rect(self.window, self.color, self.player_rect)

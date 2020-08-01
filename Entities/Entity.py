@@ -29,15 +29,13 @@ class entity:
             self.x = width - self.size[0]
         elif self.x < 0:
             self.x = 0
-        if self.y - self.size[1] > height:
-            self.y = height - self.size[0]
+        if self.y + self.size[1] > height:
+            self.y = height - self.size[1]
         elif self.y < 0:
             self.y = 0
 
     def check_death(self):
-        if self.health <= 0:
-            return True
-        return False
+        return self.health <= 0
 
 
 class projectile:
