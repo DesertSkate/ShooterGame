@@ -41,6 +41,9 @@ while playing:
         if projectile.check_boundary():
             projectiles.remove(projectile)
             continue
+        if Map.smart_collide(projectile, False):
+            projectiles.remove(projectile)
+            continue
         if collide > -1 and projectile.iff != "enemy":
             enemies[collide].take_damage(projectile.damage)
             projectiles.remove(projectile)
@@ -59,13 +62,10 @@ while playing:
         Map.smart_collide(enemy, True)
         enemy.shoot(projectiles, (Player.x, Player.y))
         enemy.draw()
-        pygame.draw.line(window, (100, 100, 100), (0, 0), (enemy.x, enemy.y), 2)
 
     Player.draw()
-    pygame.draw.line(window, (100, 100, 100), (0, 0), (Player.x, Player.y), 2)
-    print(Player.x, Player.y)
-    print(Map.get_square_by_pos((Player.x, Player.y)))
-    Map.draw_test_lines()
+    # print(Player.x, Player.y)
+    # print(Map.get_square_by_pos((Player.x, Player.y)))
     clock.tick(60)
     pygame.display.update()
     # print(enemies[0].path_point, enemies[0].x, enemies[0].y)

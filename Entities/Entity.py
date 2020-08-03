@@ -46,6 +46,7 @@ class projectile:
         self.x_speed = x_speed
         self.y_speed = y_speed
         self.radius = radius
+        self.size = (radius, radius)
         self.damage = damage
         self.color = color
         self.iff = iff

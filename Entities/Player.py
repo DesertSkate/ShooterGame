@@ -19,7 +19,7 @@ class player(entity):
         cur_time = time.time()
 
         x, y = pygame.mouse.get_pos()
-        x2, y2 = x - self.x, y - self.y
+        x2, y2 = x - self.x + self.size[0]/2, y - self.y + self.size[1]/2
         distance = (x2 ** 2 + y2 ** 2) ** .5
 
         if distance != 0:
@@ -33,7 +33,7 @@ class player(entity):
             if cur_time > self.bullet_time + 0.3:
                 self.bullet_time = time.time()
 
-                new_proj = projectile(self.window, int(self.x), int(self.y), x2, y2, 10, 1, (201, 113, 24), "player")
+                new_proj = projectile(self.window, int(self.x + self.size[0]/2), int(self.y + self.size[1]/2), x2, y2, 10, 1, (201, 113, 24), "player")
                 list.append(new_proj)
 
     def move(self):

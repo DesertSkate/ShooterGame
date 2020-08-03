@@ -30,9 +30,20 @@ class map:
             if 80 * i <= x <= 80 * (i + 1):
                 index.append(i)
                 break
+            elif x > 80 * (len(self.map_array[0]) - 1):
+                index.append(len(self.map_array[0]) - 1)
+                break
+            elif x < 0:
+                index.append(0)
         for i in range(len(self.map_array)):
             if 80 * i <= y <= 80 * (i + 1):
                 index.append(i)
+                break
+            elif y > 80 * (len(self.map_array) - 1):
+                index.append(len(self.map_array) - 1)
+                break
+            elif y < 0:
+                index.append(0)
                 break
 
         return index
@@ -75,25 +86,31 @@ class map:
             pygame.draw.line(self.window, (100, 100, 100), (80 * i, 0), (80 * i, window_size[1]), 2)
 
     def smart_collide(self, item, fix=False):
-        topL_index = self.get_square_by_pos((item.x, item.y))
-        topR_index = self.get_square_by_pos((item.x + item.size[0], item.y))
-        bottomL_index = self.get_square_by_pos((item.x, item.y + item.size[1]))
-        bottomR_index = self.get_square_by_pos((item.x + item.size[0], item.y + item.size[1]))
+        topL_index = self.get_square_by_pos((item.x + 5, item.y))
+        topR_index = self.get_square_by_pos((item.x - 5 + item.size[0], item.y))
+        rightT_index = self.get_square_by_pos((item.x, item.y + 5))
+        rightB_index = self.get_square_by_pos((item.x, item.y - 5 + item.size[1]))
+        leftT_index = self.get_square_by_pos((item.x + item.size[0], item.y + 5))
+        leftB_index = self.get_square_by_pos((item.x + item.size[0], item.y - 5 + item.size[1]))
+        bottomL_index = self.get_square_by_pos((item.x + 5, item.y + item.size[1]))
+        bottomR_index = self.get_square_by_pos((item.x - 5 + item.size[0], item.y + item.size[1]))
 
-        print(topL_index)
-        print(bottomL_index)
+        collided = False
 
-        if self.map_array[topL_index[1]][topL_index[0]] == 1 and self.map_array[bottomL_index[1]][bottomL_index[0]] == 1:
-            if fix: item.x = (80 * bottomL_index[0]) + 81
+        if self.map_array[rightT_index[1]][rightT_index[0]] == 1 or self.map_array[rightB_index[1]][rightB_index[0]] == 1:
+            if fix: item.x = (80 * rightT_index[0]) + 81
+            collided = True
 
-        if self.map_array[topR_index[1]][topR_index[0]] == 1 and self.map_array[bottomR_index[1]][bottomR_index[0]] == 1:
-            if fix: item.x = (80 * bottomR_index[0]) - item.size[0]
+        if self.map_array[leftT_index[1]][leftT_index[0]] == 1 or self.map_array[leftB_index[1]][leftB_index[0]] == 1:
+            if fix: item.x = (80 * leftT_index[0]) - item.size[0]
+            collided = True
 
-        if self.map_array[topL_index[1]][topL_index[0]] == 1 and self.map_array[topR_index[1]][topR_index[0]] == 1:
+        if self.map_array[topL_index[1]][topL_index[0]] == 1 or self.map_array[topR_index[1]][topR_index[0]] == 1:
             if fix: item.y = (80 * topL_index[1]) + 81
+            collided = True
 
-        if self.map_array[bottomL_index[1]][bottomL_index[0]] == 1 and self.map_array[bottomR_index[1]][bottomR_index[0]] == 1:
+        if self.map_array[bottomR_index[1]][bottomR_index[0]] == 1 or self.map_array[bottomL_index[1]][bottomL_index[0]] == 1:
             if fix: item.y = (80 * bottomL_index[1]) - item.size[1]
+            collided = True
 
-        # if self.map_array[topL_index[1]][topL_index[0]] == 1 and self.map_array[bottomL_index[1]][bottomL_index[0]] == 0:
-        #     if fix: item.y = (80 * topL_index[1]) + 81
+        return collided
