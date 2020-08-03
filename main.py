@@ -60,7 +60,7 @@ while playing:
             continue
         enemy.move()
         Map.smart_collide(enemy, True)
-        enemy.shoot(projectiles, (Player.x, Player.y))
+        enemy.shoot(projectiles, Player)
         enemy.draw()
 
     Player.draw()

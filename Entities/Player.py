@@ -18,16 +18,16 @@ class player(entity):
     def shoot(self, list): # https://stackoverflow.com/questions/52213088/how-to-shoot-a-bullet-at-an-angle-in-pygame
         cur_time = time.time()
 
-        x, y = pygame.mouse.get_pos()
-        x2, y2 = x - self.x + self.size[0]/2, y - self.y + self.size[1]/2
+        x, y = pygame.mouse.get_pos()[0] - self.size[0]/2, pygame.mouse.get_pos()[1] - self.size[1]/2
+        x2, y2 = x - self.x, y - self.y
         distance = (x2 ** 2 + y2 ** 2) ** .5
 
         if distance != 0:
             normalized = self.bullet_speed
             multiplier = normalized / distance
 
-            x2 *= multiplier
-            y2 *= multiplier
+            x2 *= multiplier * 0.5
+            y2 *= multiplier * 0.5
 
         if pygame.mouse.get_pressed()[0]:
             if cur_time > self.bullet_time + 0.3:

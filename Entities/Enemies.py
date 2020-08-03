@@ -17,11 +17,11 @@ class Enemy(entity):
         self.enemy_rect = pygame.Rect((self.x - self.size[0] / 2, self.y - self.size[1] / 2),
                                       self.size)
 
-    def shoot(self, list, player_pos):
+    def shoot(self, list, player_item):
         if not time.time() > self.shoot_time + self.get_idle_shoot():
             return
 
-        x, y = player_pos
+        x, y = player_item.x + player_item.size[0]/2, player_item.y + player_item.size[1]/2
         x2, y2 = x - self.x, y - self.y
         distance = (x2 ** 2 + y2 ** 2) ** .5
 
@@ -33,7 +33,7 @@ class Enemy(entity):
             y2 *= multiplier
 
         self.shoot_time = time.time()
-        new_proj = projectile(self.window, int(self.x), int(self.y), x2, y2, 10, 1, self.init_color,
+        new_proj = projectile(self.window, int(self.x + self.size[0]/2), int(self.y + self.size[1]/2), x2, y2, 10, 1, self.init_color,
                                           "enemy")
         list.append(new_proj)
 
