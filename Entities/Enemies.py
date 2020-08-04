@@ -70,22 +70,26 @@ class Enemy(entity):
         # if self.moving:
         #     return
         self.moving = True
-        if p_type == "basic":
+        if p_type == "basic" or p_type == "fast-footed":
             self.path_point = (x + random.randint(-300, 300), y + random.randint(-200, 200))
 
     def get_idle_time(self):
         p_type = self.ai[0]
         if p_type == "basic":
             return 1
+        elif p_type == "fast-footed":
+            return 0.2
 
     def get_idle_shoot(self):
         total = 0
         p_type = self.ai[0]
-        w_type = self.ai[0]
-        if p_type == "basic":
+        w_type = self.ai[1]
+        if p_type == "basic" or p_type == "fast-footed":
             total += 1
         if w_type == "single":
             total += 0.5
+        elif w_type == "quick-finger":
+            total += 0.2
         return total
 
 

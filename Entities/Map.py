@@ -1,5 +1,6 @@
 import pygame
 import random
+from .Enemies import Enemy
 
 
 class map:
@@ -48,7 +49,7 @@ class map:
 
         return index
 
-    def get_empty_tile(self, to_pos=False):
+    def get_empty_tile(self, to_pos=True):
         index = random.randint(0, 9)
         tiles = []
         for i in range(len(self.map_array[index])):
@@ -74,6 +75,18 @@ class map:
                 i[6:8] = [1] * 3
                 i[12:] = [1] * 3
         self.__gen_rects()
+
+    def generate_enemies(self, amount, enemy_list, ai_type="random"):
+        for i in range(amount):
+            pos = self.get_empty_tile()
+            if ai_type == "random":
+                ai = (random.choice(["basic", "fast-footed"]), random.choice(["single", "quick-finger"]))
+                print(ai)
+            else:
+                ai = ai_type
+            new_enemy = Enemy(self.window, f"Enemy{i}", "enemy", 3, ai, (181,18,18), 2, 2, pos[0], pos[1], (30,30))
+            enemy_list.append(new_enemy)
+
 
     def draw_map(self):
         for i in self.rect_array:

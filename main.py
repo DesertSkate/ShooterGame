@@ -19,10 +19,7 @@ enemies = []
 enemy_rects = []
 playing = True
 
-for x in range(5):
-    pos = Map.get_empty_tile(True)
-    new_enemy = Enemy(window, f"Enemy{x}", "enemy", 3, ("basic", "single"), (181,18,18), 2, 2, pos[0], pos[1], (30,30))
-    enemies.append(new_enemy)
+Map.generate_enemies(5, enemies)
 
 while playing:
     window.fill((0, 0, 0))
@@ -67,7 +64,7 @@ while playing:
             enemy.move_time = time.time()
         enemy.shoot(projectiles, Player)
         enemy.draw()
-        print(enemy.path_point)
+        print(enemy.ai)
 
     Player.draw()
     # print(Player.x, Player.y)
