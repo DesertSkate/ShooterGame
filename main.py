@@ -1,5 +1,5 @@
 import pygame
-import random
+import time
 from Entities.Player import player
 from Entities.Enemies import Enemy, update_rects
 from Entities.Map import map
@@ -32,6 +32,9 @@ while playing:
         if event.type == pygame.QUIT: playing = False
 
     Player.dash()
+    if Map.smart_collide(Player, False):
+        Player.dashing = False
+        Player.dash_time = time.time()
     Player.move()
     Map.smart_collide(Player, True)
     Player.shoot(projectiles)
@@ -59,9 +62,12 @@ while playing:
             enemies.remove(enemy)
             continue
         enemy.move()
-        Map.smart_collide(enemy, True)
+        if Map.smart_collide(enemy, True) or enemy.check_boundaries():
+            enemy.moving = False
+            enemy.move_time = time.time()
         enemy.shoot(projectiles, Player)
         enemy.draw()
+        print(enemy.path_point)
 
     Player.draw()
     # print(Player.x, Player.y)

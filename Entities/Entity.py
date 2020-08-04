@@ -25,14 +25,21 @@ class entity:
 
     def check_boundaries(self):
         width, height = pygame.display.get_surface().get_size()
+        colliding = False
         if self.x + self.size[0] > width:
             self.x = width - self.size[0]
+            colliding = True
         elif self.x < 0:
             self.x = 0
+            colliding = True
         if self.y + self.size[1] > height:
             self.y = height - self.size[1]
+            colliding = True
         elif self.y < 0:
             self.y = 0
+            colliding = True
+
+        return  colliding
 
     def check_death(self):
         return self.health <= 0
