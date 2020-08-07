@@ -87,7 +87,6 @@ class map:
             new_enemy = Enemy(self.window, f"Enemy{i}", "enemy", 3, ai, (181,18,18), 2, 2, pos[0], pos[1], (30,30))
             enemy_list.append(new_enemy)
 
-
     def draw_map(self):
         for i in self.rect_array:
             pygame.draw.rect(self.window, (255,255,255), i)

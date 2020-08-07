@@ -8,7 +8,7 @@ pygame.init()
 size = width, height = 1200, 800
 window = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
-pygame.display.set_caption("Boom")
+pygame.display.set_caption("IR")
 
 Map = map(window)
 Map.gen_map()
@@ -62,9 +62,8 @@ while playing:
         if Map.smart_collide(enemy, True) or enemy.check_boundaries():
             enemy.moving = False
             enemy.move_time = time.time()
-        enemy.shoot(projectiles, Player)
+        if enemy.has_LOS(Player, Map.rect_array): enemy.shoot(projectiles, Player)
         enemy.draw()
-        print(enemy.ai)
 
     Player.draw()
     # print(Player.x, Player.y)

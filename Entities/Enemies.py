@@ -92,6 +92,12 @@ class Enemy(entity):
             total += 0.2
         return total
 
+    def has_LOS(self, player_item, rect_list): # LOS = Line of Sight
+        for i in rect_list:
+            if i.clipline(self.x, self.y, player_item.x, player_item.y):
+                return False
+        return True
+
 
 def update_rects(enemy_list):
     list = []
