@@ -64,6 +64,7 @@ while playing:
             enemy.move_time = time.time()
         if enemy.has_LOS(Player, Map.rect_array): enemy.shoot(projectiles, Player)
         enemy.draw()
+        # print(enemy.ai)
 
     Player.draw()
     # print(Player.x, Player.y)

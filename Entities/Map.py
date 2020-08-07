@@ -80,7 +80,7 @@ class map:
         for i in range(amount):
             pos = self.get_empty_tile()
             if ai_type == "random":
-                ai = (random.choice(["basic", "fast-footed"]), random.choice(["single", "quick-finger"]))
+                ai = (random.choice(["basic", "fast-footed", "quick-finger"]), random.choice(["single", "machine gun"]))
                 print(ai)
             else:
                 ai = ai_type
