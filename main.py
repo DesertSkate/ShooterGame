@@ -19,17 +19,19 @@ enemies = []
 enemy_rects = []
 playing = True
 
-Map.generate_enemies(5, enemies)
+# Map.generate_enemies(5, enemies)
+Map.generate_enemies(1, enemies, ("basic", "single", "hunter"))
 
 while playing:
     window.fill((0, 0, 0))
     Map.draw_map()
+    Map.draw_test_lines()
     enemy_rects = update_rects(enemies)
     for event in pygame.event.get():
         if event.type == pygame.QUIT: playing = False
 
     Player.dash()
-    if Map.smart_collide(Player, False):
+    if Map.smart_collide(Player, False) or Player.check_boundaries():
         Player.dashing = False
         Player.dash_time = time.time()
     Player.move()
@@ -63,7 +65,7 @@ while playing:
             enemy.moving = False
             enemy.move_time = time.time()
         if enemy.has_LOS(Player, Map.rect_array): enemy.shoot(projectiles, Player)
-        enemy.draw()
+        enemy.draw((Player.x,Player.y))
         # print(enemy.ai)
 
     Player.draw()

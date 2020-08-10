@@ -5,14 +5,16 @@ from .Entity import entity, projectile
 
 
 class Enemy(entity):
-    def __init__(self, window, name, iff, health, ai, color, bullet_speed=2, speed=0, x=0, y=0, size=(0,0)):
+    def __init__(self, window, name, iff, health, ai, color, map_object, bullet_speed=2, speed=0, x=0, y=0, size=(0,0)):
         self.ai = ai
+        self.map = map_object
         self.origin = (x, y)
         self.bullet_speed = bullet_speed
         self.moving = False
         self.move_time = time.time()
         self.shoot_time = time.time()
         self.path_point = (x, y)
+        self.path = []
         super().__init__(window, name, iff, health, color, speed, x, y, size)
         self.enemy_rect = pygame.Rect((self.x - self.size[0] / 2, self.y - self.size[1] / 2),
                                       self.size)
@@ -52,19 +54,20 @@ class Enemy(entity):
         self.x += (x2 / distance) * self.speed
         self.y += (y2 / distance) * self.speed
 
-    def draw(self):
+    def draw(self, player_pos):
         super().check_boundaries()
         if time.time() > self.damage_time + 0.3:
             self.color = self.init_color
             self.damage_time = time.time()
         if time.time() > self.move_time + self.get_idle_time() and not self.moving:
-            self.get_point()
+            if self.ai[2] == "wander-origin":
+                self.get_point()
 
         self.enemy_rect = pygame.Rect((self.x, self.y),
                                        self.size)
         pygame.draw.rect(self.window, self.color, self.enemy_rect)
 
-    def get_point(self):  # ai should be formatted as: (movement type/personality, weapon type)
+    def get_point(self):  # ai should be formatted as: (movement type/personality, weapon type, pathing type)
         p_type = self.ai[0]
         x, y = self.origin
         # if self.moving:
@@ -99,6 +102,10 @@ class Enemy(entity):
             if i.clipline(self.x, self.y, player_item.x, player_item.y):
                 return False
         return True
+
+    def generate_path(self, start_point, end_point):
+        s_index = self.map.get_square_by_pos(start_point)
+        e_index = self.map.get_square_by_pos(end_point)
 
 
 def update_rects(enemy_list):
