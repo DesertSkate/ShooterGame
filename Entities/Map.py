@@ -8,6 +8,7 @@ class map:
         self.window = window
         self.map_array = []
         self.rect_array = []  # consider removing and instead just using math and map array for collision
+        self.win_rects = []
 
     def __init_map(self):
         window_size = pygame.display.get_surface().get_size()
@@ -15,7 +16,11 @@ class map:
             self.map_array.append([])
             for j in range(int(window_size[0] / 80)):
                 self.map_array[i].append(0)
-        print(self.map_array)
+
+    def clean_map(self):
+        self.map_array = []
+        self.rect_array = []
+        self.win_rects = []
 
     def __gen_rects(self):
         for i in range(len(self.map_array)):
@@ -49,8 +54,8 @@ class map:
 
         return index
 
-    def get_empty_tile(self, to_pos=True):
-        index = random.randint(0, 9)
+    def get_empty_tile(self, to_pos=True, specific_column=False):
+        index = random.randint(0, 9) if specific_column is False else specific_column
         tiles = []
         for i in range(len(self.map_array[index])):
             if self.map_array[index][i] == 0:
@@ -61,6 +66,7 @@ class map:
             return 80 * random.choice(tiles), 80 * index
 
     def gen_map(self):
+        self.clean_map()
         self.__init_map()
         for i in self.map_array:
             row_type = random.randint(1, 3)  # 1 = corridor, 2 = open, 3 = open with cover
@@ -81,15 +87,25 @@ class map:
             pos = self.get_empty_tile()
             if ai_type == "random":
                 ai = (random.choice(["basic", "fast-footed", "quick-finger"]), random.choice(["single", "machine gun"]), "wander-origin")
-                print(ai)
             else:
                 ai = ai_type
             new_enemy = Enemy(self.window, f"Enemy{i}", "enemy", 3, ai, (181,18,18), self, 2, 2, pos[0], pos[1], (30,30))
             enemy_list.append(new_enemy)
 
+    def set_win(self):
+        for i in range(len(self.map_array[0])):
+            if self.map_array[0][i] == 0:
+                new_rect = pygame.Rect((80 * i,0), (80,80))
+                self.win_rects.append(new_rect)
+            if self.map_array[len(self.map_array) - 1][i] == 0:
+                new_rect = pygame.Rect((80 * i, 80 * (len(self.map_array) - 1)), (80, 80))
+                self.win_rects.append(new_rect)
+
     def draw_map(self):
         for i in self.rect_array:
             pygame.draw.rect(self.window, (255,255,255), i)
+        for i in self.win_rects:
+            pygame.draw.rect(self.window, (0,255,0), i)
 
     def draw_test_lines(self):
         window_size = pygame.display.get_surface().get_size()
