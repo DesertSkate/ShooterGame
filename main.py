@@ -85,6 +85,6 @@ while playing:
     Player.draw()
     # print(Player.x, Player.y)
     # print(Map.get_square_by_pos((Player.x, Player.y)))
-    clock.tick(60)
+    clock.tick(80)
     pygame.display.update()
     # print(enemies[0].path_point, enemies[0].x, enemies[0].y)

@@ -7,6 +7,7 @@ class entity:
         self.window = window
         self.name = name
         self.iff = iff
+        self.max_health = health
         self.health = health
         self.init_color = color
         self.color = color
@@ -15,7 +16,7 @@ class entity:
         self.y = y
         self.size = size
 
-        self.damage_time = time.time()
+        self.damage_time = time.time() - 3
 
     def take_damage(self, damage):
         self.damage_time = time.time()
@@ -39,10 +40,19 @@ class entity:
             self.y = 0
             colliding = True
 
-        return  colliding
+        return colliding
 
     def check_death(self):
         return self.health <= 0
+
+    def draw_healthbar(self):
+        health_length = 55 - ((self.max_health - self .health) * (55/self.max_health))
+
+        bar_rect = pygame.Rect(self.x - 15, self.y + self.size[1] + 10, 55, 10)
+        health_rect = pygame.Rect(self.x - 15, self.y + self.size[1] + 10, health_length, 10)
+
+        pygame.draw.rect(self.window, (255, 0, 0), bar_rect)
+        pygame.draw.rect(self.window, (0, 255, 0), health_rect)
 
 
 class projectile:

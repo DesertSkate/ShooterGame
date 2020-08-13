@@ -87,3 +87,6 @@ class player(entity):
         self.player_rect = pygame.Rect((self.x, self.y),
                                        self.size)
         pygame.draw.rect(self.window, self.color, self.player_rect)
+
+        if not time.time() > self.damage_time + 2:
+            self.draw_healthbar()

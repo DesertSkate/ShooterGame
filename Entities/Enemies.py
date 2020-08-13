@@ -58,10 +58,12 @@ class Enemy(entity):
         super().check_boundaries()
         if time.time() > self.damage_time + 0.3:
             self.color = self.init_color
-            self.damage_time = time.time()
         if time.time() > self.move_time + self.get_idle_time() and not self.moving:
             if self.ai[2] == "wander-origin":
                 self.get_point()
+        if not time.time() > self.damage_time + 2:
+            self.draw_healthbar()
+            print(self.damage_time)
 
         self.enemy_rect = pygame.Rect((self.x, self.y),
                                        self.size)
