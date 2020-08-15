@@ -99,15 +99,58 @@ class Enemy(entity):
             total = 0.2
         return total
 
+    def __get_tile_value(self, cur, e_index):
+        value = cur[0] - e_index[0] if cur[0] >= e_index[0] else e_index[0] - cur[0]
+        value += cur[1] - e_index[1] if cur[1] >= e_index[1] else e_index[1] - cur[1]
+        return value
+
+    def __get_path(self, cur_index, e_index):
+        direction_index = []  # top, left, bottom, right
+        direction_index.append([cur_index[0], cur_index[1] - 1] if cur_index[1] > 0 else False)
+        direction_index.append([cur_index[0] - 1, cur_index[1]] if cur_index[0] > 0 else False)
+        direction_index.append([cur_index[0], cur_index[1] + 1] if cur_index[1] + 1 < len(self.map.map_array) else False)
+        direction_index.append([cur_index[0] + 1, cur_index[1]] if cur_index[0] + 1 < len(self.map.map_array[0]) else False)
+        lowest = [1000, 0]
+
+        for x in direction_index:
+            if not x:
+                direction_index.remove(x)
+                continue
+            elif self.map.map_array[x[1]][x[0]] == 1:
+                direction_index.remove(x)
+                continue
+        for x in direction_index:
+            value = self.__get_tile_value(x, e_index)
+            x.append(value)
+
+            if value == 0:
+                lowest = [value, direction_index.index(x)]
+                break
+            elif value < lowest[0]:
+                lowest = [value, direction_index.index(x)]
+
+        return [direction_index[lowest[1]][0], direction_index[lowest[1]][1]]
+
     def has_LOS(self, player_item, rect_list): # LOS = Line of Sight
         for i in rect_list:
             if i.clipline(self.x, self.y, player_item.x, player_item.y):
                 return False
         return True
 
-    def generate_path(self, start_point, end_point):
-        s_index = self.map.get_square_by_pos(start_point)
+    def generate_path(self, end_point):
+        s_index = self.map.get_square_by_pos((self.x, self.y))
         e_index = self.map.get_square_by_pos(end_point)
+        cur_index = s_index
+        path = []
+        looped = 0
+
+        while cur_index != e_index and looped < 100:  # replace with while
+            looped += 1
+
+            cur_index = self.__get_path(cur_index, e_index)
+            path.append(cur_index)
+            print(cur_index == e_index)
+        return path
 
 
 def update_rects(enemy_list):
