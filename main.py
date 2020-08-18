@@ -13,18 +13,19 @@ pygame.display.set_caption("IR")
 Map = map(window)
 Map.gen_map()
 test_tile = Map.get_empty_tile(True)
-Player = player(window, "Player", "player", 100, (34, 199, 64), 3, 15, test_tile[0], test_tile[1], (25, 45))
+Player = player(window, "Player", "player", 12, (34, 199, 64), 3, 15, test_tile[0], test_tile[1], (25, 45))
 projectiles = []
 enemies = []
 enemy_rects = []
 playing = True
+print(Map.map_array)
 
-Map.generate_enemies(1, enemies)
+Map.generate_enemies(5, enemies)
 
 while playing:
     window.fill((0, 0, 0))
     Map.draw_map()
-    Map.draw_test_lines()
+    # Map.draw_test_lines()
     enemy_rects = update_rects(enemies)
     for event in pygame.event.get():
         if event.type == pygame.QUIT: playing = False
@@ -60,17 +61,17 @@ while playing:
         if enemy.check_death():
             enemies.remove(enemy)
             continue
-        # enemy.move()
+        enemy.move()
         if Map.smart_collide(enemy, True) or enemy.check_boundaries():
             enemy.moving = False
             enemy.move_time = time.time()
-        # if enemy.has_LOS(Player, Map.rect_array): enemy.shoot(projectiles, Player)
+        if enemy.has_LOS(Player, Map.rect_array): enemy.shoot(projectiles, Player)
         enemy.draw((Player.x,Player.y))
-        last_pos = (enemy.x, enemy.y)
-        for x in enemy.generate_path((Player.x,Player.y)):
-            print(x)
-            pygame.draw.line(window, (0,0,255), last_pos, ((x[0] * 80) + 40, (x[1] * 80) + 40))
-            last_pos = ((x[0] * 80) + 40, (x[1] * 80) + 40)
+        # last_pos = (enemy.x, enemy.y)
+        # for x in enemy.generate_path((Player.x,Player.y)):
+        #     print(x)
+        #     pygame.draw.line(window, (0,0,255), last_pos, ((x[0] * 80) + 40, (x[1] * 80) + 40))
+        #     last_pos = ((x[0] * 80) + 40, (x[1] * 80) + 40)
         # print(enemy.ai)
 
     if len(enemies) == 0 and len(Map.win_rects) == 0:

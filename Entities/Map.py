@@ -68,18 +68,23 @@ class map:
     def gen_map(self):
         self.clean_map()
         self.__init_map()
+        last_map = False
         for i in self.map_array:
-            row_type = random.randint(1, 3)  # 1 = corridor, 2 = open, 3 = open with cover
+            row_type = random.randint(1, 4)  # 1 = corridor, 2 = open, 3 = open with cover 4 = hallway
             if row_type == 1:
                 i[0:4] = [1] * 5
                 i[10:] = [1] * 5
             elif row_type == 2:
                 i[0:2] = [1] * 3
                 i[12:] = [1] * 3
-            elif row_type == 3:
+            elif row_type == 3 and last_map != 4:
                 i[0:2] = [1] * 3
                 i[6:8] = [1] * 3
                 i[12:] = [1] * 3
+            if row_type == 4 and last_map != 3:
+                i[0:6] = [1] * 7
+                i[8:] = [1] * 7
+            last_map = row_type
         self.__gen_rects()
 
     def generate_enemies(self, amount, enemy_list, ai_type="random"):
