@@ -3,6 +3,9 @@ import time
 import random
 from .Entity import entity, projectile
 
+pygame.font.init()
+font = pygame.font.Font(pygame.font.get_default_font(), 20)
+
 
 class Enemy(entity):
     def __init__(self, window, name, iff, health, ai, color, map_object, bullet_speed=2, speed=0, x=0, y=0, size=(0,0)):
@@ -69,6 +72,10 @@ class Enemy(entity):
                                        self.size)
         pygame.draw.rect(self.window, self.color, self.enemy_rect)
 
+    def get_open_directions(self, cur_index):  # Top, right, bottom, left
+        return [self.map.map_array[cur_index[1] + 1][cur_index[0]] == 0, self.map.map_array[cur_index[1]][cur_index[0] + 1] == 0,
+                self.map.map_array[cur_index[1] - 1][cur_index[0]] == 0, self.map.map_array[cur_index[1]][cur_index[0] - 1] == 0]
+
     def get_point(self):  # ai should be formatted as: (movement type/personality, weapon type, pathing type)
         p_type = self.ai[0]
         x, y = self.origin
@@ -100,9 +107,14 @@ class Enemy(entity):
         return total
 
     def __get_tile_value(self, cur, e_index):
-        value = cur[0] - e_index[0] if cur[0] >= e_index[0] else e_index[0] - cur[0]
-        value += cur[1] - e_index[1] if cur[1] >= e_index[1] else e_index[1] - cur[1]
-        return value
+        base_value = cur[0] - e_index[0] if cur[0] >= e_index[0] else e_index[0] - cur[0]
+        base_value += cur[1] - e_index[1] if cur[1] >= e_index[1] else e_index[1] - cur[1]
+        # dirs = self.get_open_directions(cur)
+        #
+        # if dirs[0]
+        #
+        # value = values[0]
+        return base_value
 
     def __get_path(self, cur_index, e_index):
         direction_index = []  # top, left, bottom, right
@@ -112,6 +124,7 @@ class Enemy(entity):
         direction_index.append([cur_index[0] + 1, cur_index[1]] if cur_index[0] + 1 < len(self.map.map_array[0]) else False)
         lowest = [1000, 0]
 
+        print(direction_index)
         for x in direction_index:
             if not x:
                 direction_index.remove(x)
@@ -121,6 +134,8 @@ class Enemy(entity):
                 continue
         for x in direction_index:
             value = self.__get_tile_value(x, e_index)
+            self.draw_tile_values((e_index[0] * 80, e_index[1] * 80), [value, x])
+
             x.append(value)
 
             if value == 0:
@@ -144,13 +159,33 @@ class Enemy(entity):
         path = []
         looped = 0
 
-        while cur_index != e_index and looped < 100:  # replace with while
+        while looped < 100:  # replace with while
             looped += 1
 
             cur_index = self.__get_path(cur_index, e_index)
-            path.append(cur_index)
+            if len(path) == 0 or cur_index != path[len(path) - 1]:
+                path.append(cur_index)
+            print(path)
             print(cur_index == e_index)
+            if cur_index == e_index:
+                break
         return path
+
+    def draw_tile_values(self, end_point, val=False):
+        e_index = self.map.get_square_by_pos(end_point)
+        if not val == False:
+            f_surface = font.render(str(val[0]), True, (255, 255, 255))
+            self.window.blit(f_surface, (80 * val[1][0], 80 * val[1][1]))
+            return
+        for i in range(len(self.map.map_array)):
+            for j in range(len(self.map.map_array[i])):
+                print(self.map.map_array[i][j])
+                if self.map.map_array[i][j] == 0:
+                    cur_index = self.map.get_square_by_pos((80 * j, 80 * i))
+                    val = self.__get_tile_value(cur_index, e_index)
+                    f_surface = font.render(str(val), True, (255,255,255))
+                    self.window.blit(f_surface, (80 * j, 80 * i))
+
 
 
 def update_rects(enemy_list):
