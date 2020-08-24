@@ -45,11 +45,20 @@ class Enemy(entity):
     def move(self):
         if not self.moving:
             return
+        print(self.path)
+        if self.ai[2] == "hunter-killer" and len(self.path) > 0:
+            self.path_point = (self.path[0][0] * 80 + 40, self.path[0][1] * 80 + 40)
+            print(self.path_point)
+            self.path.remove(self.path[0])
         x, y = self.path_point
         x2, y2 = x - self.x, y - self.y
         distance = (x2 ** 2 + y2 ** 2) ** .5
 
-        if distance < 1:
+        if distance < 1 and self.ai != "hunter-killer":
+            self.moving = False
+            self.move_time = time.time()
+            return
+        elif distance < 1 and self.ai[2] == "hunter-killer" and len(self.path) == 0:
             self.moving = False
             self.move_time = time.time()
             return
@@ -64,6 +73,9 @@ class Enemy(entity):
         if time.time() > self.move_time + self.get_idle_time() and not self.moving:
             if self.ai[2] == "wander-origin":
                 self.get_point()
+            if self.ai[2] == "hunter-killer":
+                self.moving = True
+                self.path = self.generate_path(player_pos)
         if not time.time() > self.damage_time + 2:
             self.draw_healthbar()
             print(self.damage_time)
@@ -129,10 +141,9 @@ class Enemy(entity):
         to_visit = [start_node]
         visited = []
         outer_iterations = 0
-        max_iterations = 100  # (len(self.map.map_array) // 2) ** 10
+        max_iterations = 1000  # (len(self.map.map_array) // 2) ** 10
 
         while len(to_visit) > 0:
-            print(visited)
             outer_iterations += 1
 
             movements = [[1,0],[0,1],[-1,0],[0,-1]]
@@ -150,14 +161,13 @@ class Enemy(entity):
 
             to_visit.pop(current_index)
             visited.append(current_node)
-            print(current_node.position, end_node.position)
-            if current_node == end_node:
-                print("DOGOGOGOGO")
+            if tuple(current_node.position) == tuple(end_node.position):
                 path = []
                 current = current_node
                 while current is not None:
                     path.append(current.position)
                     current = current.parent
+                # print(path)
                 return path[::-1]
 
             children = []
@@ -177,8 +187,6 @@ class Enemy(entity):
                 new_node = Node(current_node, node_pos)
                 children.append(new_node)
 
-            # print(children)
-
             for child in children:
                 if len([visited_child for visited_child in visited if visited_child == child]) > 0:
                     continue
@@ -186,27 +194,12 @@ class Enemy(entity):
                 child.g = current_node.g + 1
                 child.h = (((child.position[0] - end_node.position[0]) ** 2) + ((child.position[1] - end_node.position[1]) ** 2))
                 child.f = child.h + child.g
-                print(child.g, child.h, child.f)
 
                 if len([i for i in to_visit if child == i and child.g > i.g]) > 0:
                     continue
 
                 to_visit.append(child)
         return []
-
-    def draw_tile_values(self, end_point, val=False):
-        e_index = self.map.get_square_by_pos(end_point)
-        if not val == False:
-            f_surface = font.render(str(val[0]), True, (255, 255, 255))
-            self.window.blit(f_surface, (80 * val[1][0], 80 * val[1][1]))
-            return
-        for i in range(len(self.map.map_array)):
-            for j in range(len(self.map.map_array[i])):
-                if self.map.map_array[i][j] == 0:
-                    cur_index = self.map.get_square_by_pos((80 * j, 80 * i))
-                    val = self.__get_tile_value(cur_index, e_index)
-                    f_surface = font.render(str(val), True, (255,255,255))
-                    self.window.blit(f_surface, (80 * j, 80 * i))
 
 
 def update_rects(enemy_list):

@@ -91,7 +91,8 @@ class map:
         for i in range(amount):
             pos = self.get_empty_tile()
             if ai_type == "random":
-                ai = (random.choice(["basic", "fast-footed", "quick-finger"]), random.choice(["single", "machine gun"]), "wander-origin")
+                ai = (random.choice(["basic", "fast-footed", "quick-finger"]), random.choice(["single", "machine gun"]),
+                      random.choice(["wander-origin", "hunter-killer"]))
             else:
                 ai = ai_type
             new_enemy = Enemy(self.window, f"Enemy{i}", "enemy", 3, ai, (181,18,18), self, 2, 2, pos[0] + 40, pos[1] + 40, (30,30))

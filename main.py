@@ -21,7 +21,7 @@ enemy_rects = []
 playing = True
 print(Map.map_array)
 
-Map.generate_enemies(1, enemies)
+Map.generate_enemies(5, enemies)
 
 while playing:
     window.fill((0, 0, 0))
@@ -31,7 +31,8 @@ while playing:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: playing = False
 
-    if Player.check_death(): playing = False
+    if Player.check_death():
+        playing = False
     Player.dash()
     if Map.smart_collide(Player, False) or Player.check_boundaries():
         Player.dashing = False
@@ -62,22 +63,14 @@ while playing:
         if enemy.check_death():
             enemies.remove(enemy)
             continue
-        # enemy.move()
+        if enemy.ai[2] == "hunter-killer":
+            pygame.draw.line(window, (0,0,255), (enemy.x,enemy.y), enemy.path_point)
+        enemy.move()
         if Map.smart_collide(enemy, True) or enemy.check_boundaries():
             enemy.moving = False
             enemy.move_time = time.time()
-        # if enemy.has_LOS(Player, Map.rect_array): enemy.shoot(projectiles, Player)
+        if enemy.has_LOS(Player, Map.rect_array): enemy.shoot(projectiles, Player)
         enemy.draw((Player.x,Player.y))
-        # enemy.draw_tile_values((Player.x,Player.y))
-        # print(enemy.generate_path((Player.x, Player.y)))
-        last_pos = (enemy.x, enemy.y)
-        path = enemy.generate_path((Player.x,Player.y))
-        print(path)
-        for x in path:
-            # print(path)
-            pygame.draw.line(window, (0,0,255), last_pos, ((x[0] * 80) + 40, (x[1] * 80) + 40))
-            last_pos = ((x[0] * 80) + 40, (x[1] * 80) + 40)
-        # print(enemy.ai)
 
     if len(enemies) == 0 and len(Map.win_rects) == 0:
         Map.set_win()
