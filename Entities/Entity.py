@@ -82,3 +82,16 @@ class projectile:
             return True
         if self.y > height or self.y < 0:
             return True
+
+# https://towardsdatascience.com/a-star-a-search-algorithm-eb495fb156bb
+class Node:
+    def __init__(self, parent, position):
+        self.parent = parent
+        self.position = position
+
+        self.g = 0
+        self.h = 0
+        self.f = 0
+
+    def __eq__(self, other):
+        return self.position == other.position

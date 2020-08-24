@@ -69,9 +69,12 @@ while playing:
         # if enemy.has_LOS(Player, Map.rect_array): enemy.shoot(projectiles, Player)
         enemy.draw((Player.x,Player.y))
         # enemy.draw_tile_values((Player.x,Player.y))
+        # print(enemy.generate_path((Player.x, Player.y)))
         last_pos = (enemy.x, enemy.y)
-        for x in enemy.generate_path((Player.x,Player.y)):
-            # print(x)
+        path = enemy.generate_path((Player.x,Player.y))
+        print(path)
+        for x in path:
+            # print(path)
             pygame.draw.line(window, (0,0,255), last_pos, ((x[0] * 80) + 40, (x[1] * 80) + 40))
             last_pos = ((x[0] * 80) + 40, (x[1] * 80) + 40)
         # print(enemy.ai)
@@ -84,15 +87,12 @@ while playing:
         if Player.y <= 80:
             pos = Map.get_empty_tile(True, 9)
             Player.x, Player.y = pos
-            print(pos)
         else:
             pos = Map.get_empty_tile(True, 0)
             Player.x, Player.y = pos
             print(Map.get_empty_tile(pos))
 
     Player.draw()
-    # print(Player.x, Player.y)
-    # print(Map.get_square_by_pos((Player.x, Player.y)))
     clock.tick(80)
     pygame.display.update()
     # print(enemies[0].path_point, enemies[0].x, enemies[0].y)

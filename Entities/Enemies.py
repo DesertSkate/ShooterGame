@@ -1,7 +1,7 @@
 import pygame
 import time
 import random
-from .Entity import entity, projectile
+from .Entity import entity, projectile, Node
 
 pygame.font.init()
 font = pygame.font.Font(pygame.font.get_default_font(), 20)
@@ -72,9 +72,17 @@ class Enemy(entity):
                                        self.size)
         pygame.draw.rect(self.window, self.color, self.enemy_rect)
 
-    def get_open_directions(self, cur_index):  # Top, right, bottom, left
-        return [self.map.map_array[cur_index[1] + 1][cur_index[0]] == 0, self.map.map_array[cur_index[1]][cur_index[0] + 1] == 0,
-                self.map.map_array[cur_index[1] - 1][cur_index[0]] == 0, self.map.map_array[cur_index[1]][cur_index[0] - 1] == 0]
+    def get_adjacent(self, cur_index):  # Top, right, bottom, left
+        adjacent = []
+        if not cur_index[1] == 0:
+            adjacent.append([cur_index[1] + 1, cur_index[0]])
+        if cur_index[0] != len(self.map.map_array) - 1:
+            adjacent.append([cur_index[1] - 1, cur_index[0]])
+        if cur_index[1] != len(self.map.map_array) - 1:
+            adjacent.append([cur_index[1] - 1, cur_index[0]])
+        if not cur_index[0] == 0:
+            adjacent.append([cur_index[1], cur_index[0] - 1])
+        return adjacent
 
     def get_point(self):  # ai should be formatted as: (movement type/personality, weapon type, pathing type)
         p_type = self.ai[0]
@@ -106,70 +114,85 @@ class Enemy(entity):
             total = 0.2
         return total
 
-    def __get_tile_value(self, cur, e_index):
-        base_value = cur[0] - e_index[0] if cur[0] >= e_index[0] else e_index[0] - cur[0]
-        base_value += cur[1] - e_index[1] if cur[1] >= e_index[1] else e_index[1] - cur[1]
-        # dirs = self.get_open_directions(cur)
-        #
-        # if dirs[0]
-        #
-        # value = values[0]
-        return base_value
-
-    def __get_path(self, cur_index, e_index):
-        direction_index = []  # top, left, bottom, right
-        direction_index.append([cur_index[0], cur_index[1] - 1] if cur_index[1] > 0 else False)
-        direction_index.append([cur_index[0] - 1, cur_index[1]] if cur_index[0] > 0 else False)
-        direction_index.append([cur_index[0], cur_index[1] + 1] if cur_index[1] + 1 < len(self.map.map_array) else False)
-        direction_index.append([cur_index[0] + 1, cur_index[1]] if cur_index[0] + 1 < len(self.map.map_array[0]) else False)
-        lowest = [1000, 0]
-
-        print(direction_index)
-        for x in direction_index:
-            if not x:
-                direction_index.remove(x)
-                continue
-            elif self.map.map_array[x[1]][x[0]] == 1:
-                direction_index.remove(x)
-                continue
-        for x in direction_index:
-            value = self.__get_tile_value(x, e_index)
-            self.draw_tile_values((e_index[0] * 80, e_index[1] * 80), [value, x])
-
-            x.append(value)
-
-            if value == 0:
-                lowest = [value, direction_index.index(x)]
-                break
-            elif value < lowest[0]:
-                lowest = [value, direction_index.index(x)]
-
-        return [direction_index[lowest[1]][0], direction_index[lowest[1]][1]]
-
     def has_LOS(self, player_item, rect_list): # LOS = Line of Sight
         for i in rect_list:
             if i.clipline(self.x, self.y, player_item.x, player_item.y):
                 return False
         return True
 
-    def generate_path(self, end_point):
-        s_index = self.map.get_square_by_pos((self.x, self.y))
-        e_index = self.map.get_square_by_pos(end_point)
-        cur_index = s_index
-        path = []
-        looped = 0
+    def generate_path(self, end_point=()):
+        start_node = Node(None, self.map.get_square_by_pos((self.x,self.y)))
+        start_node.g = start_node.h = start_node.f = 0
+        end_node = Node(None, self.map.get_square_by_pos(end_point))
+        end_node.g = end_node.h = end_node.f = 0
 
-        while looped < 100:  # replace with while
-            looped += 1
+        to_visit = [start_node]
+        visited = []
+        outer_iterations = 0
+        max_iterations = 100  # (len(self.map.map_array) // 2) ** 10
 
-            cur_index = self.__get_path(cur_index, e_index)
-            if len(path) == 0 or cur_index != path[len(path) - 1]:
-                path.append(cur_index)
-            print(path)
-            print(cur_index == e_index)
-            if cur_index == e_index:
-                break
-        return path
+        while len(to_visit) > 0:
+            print(visited)
+            outer_iterations += 1
+
+            movements = [[1,0],[0,1],[-1,0],[0,-1]]
+
+            current_node = to_visit[0]
+            current_index = 0
+            for index, item in enumerate(to_visit):
+                if item.f < current_node.f:
+                    current_node = item
+                    current_index = index
+
+            if outer_iterations > max_iterations:
+                print("Too many iterations")
+                return []
+
+            to_visit.pop(current_index)
+            visited.append(current_node)
+            print(current_node.position, end_node.position)
+            if current_node == end_node:
+                print("DOGOGOGOGO")
+                path = []
+                current = current_node
+                while current is not None:
+                    path.append(current.position)
+                    current = current.parent
+                return path[::-1]
+
+            children = []
+
+            for new_pos in movements:
+                node_pos = (current_node.position[0] + new_pos[0], current_node.position[1] + new_pos[1])
+
+                if (node_pos[0] > len(self.map.map_array[0]) - 1 or
+                    node_pos[0] < 0 or
+                    node_pos[1] > len(self.map.map_array) - 1 or
+                    node_pos[1] < 0):
+                    continue
+
+                if self.map.map_array[node_pos[1]][node_pos[0]] != 0:
+                    continue
+
+                new_node = Node(current_node, node_pos)
+                children.append(new_node)
+
+            # print(children)
+
+            for child in children:
+                if len([visited_child for visited_child in visited if visited_child == child]) > 0:
+                    continue
+
+                child.g = current_node.g + 1
+                child.h = (((child.position[0] - end_node.position[0]) ** 2) + ((child.position[1] - end_node.position[1]) ** 2))
+                child.f = child.h + child.g
+                print(child.g, child.h, child.f)
+
+                if len([i for i in to_visit if child == i and child.g > i.g]) > 0:
+                    continue
+
+                to_visit.append(child)
+        return []
 
     def draw_tile_values(self, end_point, val=False):
         e_index = self.map.get_square_by_pos(end_point)
@@ -179,13 +202,11 @@ class Enemy(entity):
             return
         for i in range(len(self.map.map_array)):
             for j in range(len(self.map.map_array[i])):
-                print(self.map.map_array[i][j])
                 if self.map.map_array[i][j] == 0:
                     cur_index = self.map.get_square_by_pos((80 * j, 80 * i))
                     val = self.__get_tile_value(cur_index, e_index)
                     f_surface = font.render(str(val), True, (255,255,255))
                     self.window.blit(f_surface, (80 * j, 80 * i))
-
 
 
 def update_rects(enemy_list):
@@ -194,3 +215,6 @@ def update_rects(enemy_list):
         list.append(enemy.enemy_rect)
 
     return list
+
+def sort_f(e):
+    return e.f
