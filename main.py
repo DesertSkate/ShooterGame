@@ -60,6 +60,7 @@ while playing:
         projectile.update()
 
     for enemy in enemies:
+        # print(enemy.generate_path((Player.x,Player.y)))
         if enemy.check_death():
             enemies.remove(enemy)
             continue

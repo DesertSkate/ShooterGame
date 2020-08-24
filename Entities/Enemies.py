@@ -45,7 +45,7 @@ class Enemy(entity):
     def move(self):
         if not self.moving:
             return
-        print(self.path)
+        print(self.path, "1")
         if self.ai[2] == "hunter-killer" and len(self.path) > 0:
             self.path_point = (self.path[0][0] * 80 + 40, self.path[0][1] * 80 + 40)
             print(self.path_point)
@@ -76,6 +76,7 @@ class Enemy(entity):
             if self.ai[2] == "hunter-killer":
                 self.moving = True
                 self.path = self.generate_path(player_pos)
+                print(self.path, "2")
         if not time.time() > self.damage_time + 2:
             self.draw_healthbar()
             print(self.damage_time)
